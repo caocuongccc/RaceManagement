@@ -21,6 +21,9 @@ namespace RaceManagement.Core.Interfaces
         ISheetConfigRepository SheetConfigs { get; }
         // Add to IUnitOfWork interface:
         IEmailQueueRepository EmailQueues { get; }
+        // NEW: Add Dashboard repository
+        IDashboardRepository Dashboard { get; }
+
         Task<int> SaveChangesAsync();
         Task BeginTransactionAsync();
         Task CommitAsync();

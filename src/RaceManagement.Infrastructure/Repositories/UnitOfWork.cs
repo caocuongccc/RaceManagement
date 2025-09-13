@@ -27,6 +27,7 @@ namespace RaceManagement.Infrastructure.Repositories
             Credentials = new CredentialRepository(_context);      // NEW
             SheetConfigs = new SheetConfigRepository(_context);   // NEW
             EmailQueues = new EmailQueueRepository(_context);
+            Dashboard = new DashboardRepository(_context);
 
         }
 
@@ -41,6 +42,7 @@ namespace RaceManagement.Infrastructure.Repositories
         public ISheetConfigRepository SheetConfigs { get; }       // NEW
         // Add to IUnitOfWork interface:
         public IEmailQueueRepository EmailQueues { get; }
+        public IDashboardRepository Dashboard { get; }
         public async Task<int> SaveChangesAsync()
         {
             return await _context.SaveChangesAsync();
