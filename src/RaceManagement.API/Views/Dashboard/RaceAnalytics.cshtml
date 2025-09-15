@@ -1,0 +1,118 @@
+﻿@model RaceManagement.API.ViewModels.RaceAnalyticsViewModel
+@{
+    ViewData["Title"] = Model.PageTitle;
+}
+
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/Dashboard">Dashboard</a></li>
+                    <li class="breadcrumb-item active">Race Analytics</li>
+                </ol>
+            </nav>
+            <h1>@Model.PageTitle</h1>
+        </div>
+    </div>
+
+    @if (Model.HasData)
+    {
+        <!-- Race Overview Cards -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card bg-primary text-white">
+                    <div class="card-body text-center">
+                        <h3>@Model.Analytics.TotalRegistrations</h3>
+                        <p class="mb-0">Total Registrations</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-success text-white">
+                    <div class="card-body text-center">
+                        <h3>@Model.FormattedTotalRevenue</h3>
+                        <p class="mb-0">Revenue</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-info text-white">
+                    <div class="card-body text-center">
+                        <h3>@Model.CompletionRateFormatted</h3>
+                        <p class="mb-0">Completion Rate</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-warning text-white">
+                    <div class="card-body text-center">
+                        <div class="d-flex align-items-center justify-content-center">
+                            <i class="@Model.TrendDirectionIcon me-2"></i>
+                            <span>@Model.TrendDirectionText</span>
+                        </div>
+                        <p class="mb-0">Trend</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Distance Analytics -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Distance Performance</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Distance</th>
+                                        <th>Registrations</th>
+                                        <th>Capacity</th>
+                                        <th>Fill Rate</th>
+                                        <th>Revenue</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var distance in Model.Analytics.DistanceAnalytics)
+                                    {
+                                        <tr>
+                                            <td>@distance.Distance</td>
+                                            <td>@distance.Registrations</td>
+                                            <td>@distance.MaxCapacity</td>
+                                            <td>
+                                                <div class="progress" style="height: 20px;">
+                                                    <div class="progress-bar" style="width: @distance.FillRate%">
+                                                        @distance.FillRate.ToString("F1")%
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>@distance.Revenue.ToString("C0")</td>
+                                            <td>
+                                                @if (distance.IsPopular)
+                                                {
+                                                    <span class="badge bg-success">Popular</span>
+                                                }
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle me-2"></i>
+            No data available for this race.
+        </div>
+    }
+</div>

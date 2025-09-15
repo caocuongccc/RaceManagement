@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RaceManagement.Shared.DTOs;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,5 +13,8 @@ namespace RaceManagement.Core.Interfaces
         Task<byte[]> GeneratePaymentQRCodeAsync(string transactionReference, decimal amount, string bankInfo);
         Task<string> GeneratePaymentStringAsync(string transactionReference, decimal amount, string bankInfo);
         Task<byte[]> GenerateBibQRCodeAsync(string bibNumber, string raceName);
+        Task<byte[]> GenerateQRCodeWithLogoAsync(string content, byte[]? logoBytes = null);
+        Task<byte[]> GeneratePaymentQRCodeAsync(RegistrationDto registration);
+
     }
 }

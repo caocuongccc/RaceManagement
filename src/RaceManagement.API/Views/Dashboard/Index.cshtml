@@ -1,0 +1,429 @@
+﻿@model RaceManagement.API.ViewModels.DashboardViewModel
+@{
+    ViewData["Title"] = Model.PageTitle;
+}
+
+<div class="dashboard-container">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="dashboard-title">@Model.PageTitle</h1>
+                    <p class="text-muted">Last updated: @Model.LastRefresh.ToString("dd/MM/yyyy HH:mm")</p>
+                </div>
+                <div>
+                    <button class="btn btn-outline-primary btn-sm" onclick="refreshDashboard()">
+                        <i class="fas fa-sync me-1"></i>Refresh
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Error Alert -->
+    @if (Model.HasErrors)
+    {
+        @Html.Partial("_ErrorPartial", Model.ErrorMessage)
+    }
+
+    <!-- Stats Cards - Using Partial View -->
+    <div id="statsContainer" class="mb-4">
+        @Html.Partial("_StatsPartial", Model.Overview)
+    </div>
+
+    <!-- Charts Row -->
+    @if (Model.ShowCharts)
+    {
+        <div class="row mb-4">
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between">
+                        <h5 class="mb-0">Registration Trends</h5>
+                        <div class="btn-group btn-group-sm">
+                            <button class="btn btn-outline-secondary" onclick="loadChart('registrationChart', 7)">7d</button>
+                            <button class="btn btn-outline-secondary active" onclick="loadChart('registrationChart', 30)">30d</button>
+                            <button class="btn btn-outline-secondary" onclick="loadChart('registrationChart', 90)">90d</button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div id="chartLoading" class="text-center py-4" style="display: none;">
+                            @Html.Partial("_LoadingPartial")
+                        </div>
+                        <canvas id="registrationChart" height="100"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Race Status Distribution</h5>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="statusChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Email Stats & Recent Activities Row -->
+    <div class="row mb-4">
+        @if (Model.ShowEmailStats)
+        {
+            <div class="col-lg-6">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between">
+                        <h5 class="mb-0">Email System Status</h5>
+                        <span class="badge bg-success">@Model.EmailSuccessRate.ToString("F1")% Success Rate</span>
+                    </div>
+                    <div class="card-body" id="emailStatsContainer">
+                        @Html.Partial("_EmailStatsPartial", Model.Overview.EmailStats)
+                    </div>
+                </div>
+            </div>
+        }
+        
+        @if (Model.ShowRecentActivities)
+        {
+            <div class="col-lg-6">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between">
+                        <h5 class="mb-0">Recent Activities</h5>
+                        <button class="btn btn-sm btn-outline-primary" onclick="refreshActivities()">
+                            <i class="fas fa-sync"></i>
+                        </button>
+                    </div>
+                    <div class="card-body" style="max-height: 400px; overflow-y: auto;">
+                        <div id="recentActivitiesContainer">
+                            @Html.Partial("_RecentActivitiesPartial", Model.Overview.RecentActivities)
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <!-- Alert for Pending Issues -->
+    @if (Model.HasPendingIssues)
+    {
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="alert alert-warning d-flex align-items-center">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <div class="flex-grow-1">
+                        <strong>Attention Required:</strong>
+                        @if (Model.Overview.PendingPayments > 0)
+                        {
+                            <span>@Model.Overview.PendingPayments pending payments</span>
+                        }
+                        @if (Model.Overview.BibsToGenerate > 0)
+                        {
+                            @if (Model.Overview.PendingPayments > 0) { <span> and </span> }
+                            <span>@Model.Overview.BibsToGenerate BIBs to generate</span>
+                        }
+                    </div>
+                    <a href="/Dashboard/SystemHealth" class="btn btn-sm btn-warning">View Details</a>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Quick Actions -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Quick Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 mb-2">
+                            <a href="/Dashboard/Reports" class="btn btn-outline-primary w-100">
+                                <i class="fas fa-chart-bar me-2"></i>View Reports
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <a href="/Dashboard/SystemHealth" class="btn btn-outline-success w-100">
+                                <i class="fas fa-heartbeat me-2"></i>System Health
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <a href="/api/races" class="btn btn-outline-info w-100">
+                                <i class="fas fa-flag me-2"></i>Manage Races
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <button class="btn btn-outline-warning w-100" onclick="runHealthCheck()">
+                                <i class="fas fa-sync me-2"></i>Run Health Check
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    let registrationChart;
+    let statusChart;
+    
+    // Initialize Dashboard
+    $(document).ready(function() {
+        loadRegistrationChart(30);
+        loadStatusChart();
+        
+        // Auto-refresh every 5 minutes
+        setInterval(refreshStats, 5 * 60 * 1000);
+    });
+    
+    // Load Registration Chart
+    async function loadRegistrationChart(days = 30) {
+        showChartLoading(true);
+        
+        try {
+            const response = await fetch(`/Dashboard/GetRegistrationTrends?days=${days}`);
+            const chartData = await response.json();
+            
+            const ctx = document.getElementById('registrationChart').getContext('2d');
+            
+            if (registrationChart) {
+                registrationChart.destroy();
+            }
+            
+            registrationChart = new Chart(ctx, {
+                type: chartData.chartType,
+                data: {
+                    labels: chartData.labels,
+                    datasets: chartData.datasets
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Daily Registrations'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        } catch (error) {
+            console.error('Error loading registration chart:', error);
+            showToast('Error loading chart data', 'error');
+        } finally {
+            showChartLoading(false);
+        }
+    }
+    
+    // Load Status Chart
+    async function loadStatusChart() {
+        try {
+            const response = await fetch('/Dashboard/GetRaceStatusDistribution');
+            const data = await response.json();
+            
+            const ctx = document.getElementById('statusChart').getContext('2d');
+            statusChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: data.map(d => d.status),
+                    datasets: [{
+                        data: data.map(d => d.count),
+                        backgroundColor: data.map(d => d.color)
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        } catch (error) {
+            console.error('Error loading status chart:', error);
+        }
+    }
+    
+    // Refresh Functions
+    async function refreshStats() {
+        try {
+            const response = await fetch('/Dashboard/StatsPartial');
+            const html = await response.text();
+            $('#statsContainer').html(html);
+        } catch (error) {
+            console.error('Error refreshing stats:', error);
+        }
+    }
+    
+    async function refreshActivities() {
+        try {
+            const response = await fetch('/Dashboard/RecentActivitiesPartial');
+            const html = await response.text();
+            $('#recentActivitiesContainer').html(html);
+            showToast('Activities refreshed', 'success');
+        } catch (error) {
+            console.error('Error refreshing activities:', error);
+            showToast('Error refreshing activities', 'error');
+        }
+    }
+    
+    async function refreshDashboard() {
+        showToast('Refreshing dashboard...', 'info');
+        location.reload();
+    }
+    
+    // Health Check
+    async function runHealthCheck() {
+        const button = event.target;
+        const originalHtml = button.innerHTML;
+        button.disabled = true;
+        button.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Running...';
+        
+        try {
+            const response = await fetch('/Dashboard/RunHealthCheck', {
+                method: 'POST'
+            });
+            const result = await response.json();
+            
+            if (result.success) {
+                showToast('Health check completed successfully', 'success');
+            } else {
+                showToast('Health check failed: ' + result.error, 'error');
+            }
+        } catch (error) {
+            showToast('Error running health check', 'error');
+        } finally {
+            button.disabled = false;
+            button.innerHTML = originalHtml;
+        }
+    }
+    
+    // Utility Functions
+    function loadChart(chartId, days) {
+        // Update active button
+        event.target.parentElement.querySelectorAll('.btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        event.target.classList.add('active');
+        
+        if (chartId === 'registrationChart') {
+            loadRegistrationChart(days);
+        }
+    }
+    
+    function showChartLoading(show) {
+        const loader = document.getElementById('chartLoading');
+        if (loader) {
+            loader.style.display = show ? 'block' : 'none';
+        }
+    }
+    
+    function showToast(message, type) {
+        const toastClass = type === 'success' ? 'alert-success' : 
+                          type === 'error' ? 'alert-danger' : 
+                          type === 'warning' ? 'alert-warning' : 'alert-info';
+        
+        const toast = $(`
+            <div class="alert ${toastClass} alert-dismissible fade show toast-notification" role="alert">
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        `);
+        
+        $('body').append(toast);
+        
+        setTimeout(() => {
+            toast.alert('close');
+        }, 3000);
+    }
+</script>
+<style>
+    .dashboard-container {
+        padding: 20px;
+    }
+    
+    .dashboard-title {
+        color: #333;
+        margin-bottom: 10px;
+    }
+    
+    .stat-card {
+        height: 120px;
+        margin-bottom: 20px;
+        transition: transform 0.2s;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-2px);
+    }
+    
+    .stat-icon {
+        font-size: 2rem;
+        opacity: 0.8;
+    }
+    
+    .activity-item {
+        padding: 8px 0;
+        border-bottom: 1px solid #eee;
+    }
+    
+    .activity-item:last-child {
+        border-bottom: none;
+    }
+    
+    .activity-icon {
+        width: 30px;
+        text-align: center;
+        padding-top: 2px;
+    }
+    
+    .toast-notification {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 9999;
+        min-width: 300px;
+        animation: slideInRight 0.3s ease-in;
+    }
+    
+    /* Fix keyframes syntax */
+    @@keyframes slideInRight {
+        0% { 
+            transform: translateX(100%); 
+            opacity: 0;
+        }
+        100% { 
+            transform: translateX(0); 
+            opacity: 1;
+        }
+    }
+    
+    .card {
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        border: none;
+        margin-bottom: 1rem;
+    }
+    
+    .card-header {
+        background-color: #f8f9fa;
+        border-bottom: 1px solid #dee2e6;
+    }
+    
+    .loading-spinner {
+        display: none;
+    }
+    
+    .loading .loading-spinner {
+        display: inline-block;
+    }
+</style>
+}

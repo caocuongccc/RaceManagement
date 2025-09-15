@@ -1,0 +1,264 @@
+﻿@using RaceManagement.API.Extensions
+@model RaceManagement.API.ViewModels.ReportsViewModel
+@{
+    ViewData["Title"] = Model.PageTitle;
+}
+
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1>@Model.PageTitle</h1>
+                    <p class="text-muted">Generated on: @Model.ReportDate.ToString("dd/MM/yyyy HH:mm")</p>
+                </div>
+                <div>
+                    <button class="btn btn-outline-primary" onclick="exportReport('pdf')">
+                        <i class="fas fa-file-pdf me-1"></i>Export PDF
+                    </button>
+                    <button class="btn btn-outline-success" onclick="exportReport('excel')">
+                        <i class="fas fa-file-excel me-1"></i>Export Excel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card bg-primary text-white">
+                <div class="card-body text-center">
+                    <h3>@Model.TotalRevenue.ToString("C0")</h3>
+                    <p class="mb-0">Total Revenue</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-success text-white">
+                <div class="card-body text-center">
+                    <h3>@Model.TotalRegistrations</h3>
+                    <p class="mb-0">Total Registrations</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-info text-white">
+                <div class="card-body text-center">
+                    <h3>@Model.AverageCompletionRate.ToString("F1")%</h3>
+                    <p class="mb-0">Avg Completion Rate</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Date Filter -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <form class="row g-3" onsubmit="filterReports(); return false;">
+                        <div class="col-md-3">
+                            <label class="form-label">From Date</label>
+                            <input type="date" class="form-control" id="fromDate" value="@Model.FromDate.ToString("yyyy-MM-dd")">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">To Date</label>
+                            <input type="date" class="form-control" id="toDate" value="@Model.ToDate.ToString("yyyy-MM-dd")">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Quick Select</label>
+                            <select class="form-control" onchange="setQuickDate(this.value)">
+                                <option value="">Custom</option>
+                                <option value="7">Last 7 days</option>
+                                <option value="30">Last 30 days</option>
+                                <option value="90" selected>Last 3 months</option>
+                                <option value="365">Last year</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">&nbsp;</label>
+                            <button type="submit" class="form-control btn btn-primary">
+                                <i class="fas fa-filter me-1"></i>Apply Filter
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts -->
+    <div class="row mb-4">
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Registration Trends</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="trendsChart" height="150"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Revenue Trends</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="revenueChart" height="150"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top Performing Races -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Top Performing Races</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Race Name</th>
+                                    <th>Date</th>
+                                    <th>Registrations</th>
+                                    <th>Revenue</th>
+                                    <th>Completion Rate</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var race in Model.TopPerformingRaces)
+                                {
+                                    <tr>
+                                        <td>
+                                            <strong>@race.RaceName</strong>
+                                            <div class="d-flex align-items-center mt-1">
+                                                <i class="@race.GetTrendDirectionIcon() me-1"></i>
+                                                <small class="text-muted">@race.TrendDirection</small>
+                                            </div>
+                                        </td>
+                                        <td>@race.RaceDate.ToString("dd/MM/yyyy")</td>
+                                        <td>
+                                            <span class="fw-bold">@race.TotalRegistrations</span>
+                                            <small class="text-muted d-block">@race.PaidRegistrations paid</small>
+                                        </td>
+                                        <td>
+                                            <span class="fw-bold">@race.TotalRevenue.ToString("C0")</span>
+                                            <small class="text-muted d-block">@race.AverageRegistrationValue.ToString("C0") avg</small>
+                                        </td>
+                                        <td>
+                                            <div class="progress" style="height: 20px;">
+                                                <div class="progress-bar" style="width: @race.CompletionRate%">
+                                                    @race.CompletionRate.ToString("F1")%
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <a href="/Dashboard/RaceAnalytics/@race.RaceId" class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-chart-line me-1"></i>View Details
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        let trendsChart;
+        let revenueChart;
+
+        $(document).ready(function () {
+            loadTrendsChart();
+            loadRevenueChart();
+        });
+
+        function loadTrendsChart() {
+            const ctx = document.getElementById('trendsChart').getContext('2d');
+            trendsChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: @Html.Raw(Json.Serialize(Model.OverallTrends.Select(t => t.Label))),
+                    datasets: [{
+                        label: 'Registrations',
+                        data: @Html.Raw(Json.Serialize(Model.OverallTrends.Select(t => t.RegistrationCount))),
+                        borderColor: '#007bff',
+                        backgroundColor: 'rgba(0, 123, 255, 0.1)',
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        function loadRevenueChart() {
+            const ctx = document.getElementById('revenueChart').getContext('2d');
+            revenueChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: @Html.Raw(Json.Serialize(Model.RevenueTrends.Select(t => t.Label))),
+                    datasets: [{
+                        label: 'Revenue',
+                        data: @Html.Raw(Json.Serialize(Model.RevenueTrends.Select(t => t.Revenue))),
+                        borderColor: '#28a745',
+                        backgroundColor: 'rgba(40, 167, 69, 0.1)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        function setQuickDate(days) {
+            if (!days) return;
+
+            const toDate = new Date();
+            const fromDate = new Date();
+            fromDate.setDate(toDate.getDate() - parseInt(days));
+
+            document.getElementById('fromDate').value = fromDate.toISOString().split('T')[0];
+            document.getElementById('toDate').value = toDate.toISOString().split('T')[0];
+        }
+
+        function filterReports() {
+            const fromDate = document.getElementById('fromDate').value;
+            const toDate = document.getElementById('toDate').value;
+
+            if (fromDate && toDate) {
+                window.location.href = `/Dashboard/Reports?fromDate=${fromDate}&toDate=${toDate}`;
+            }
+        }
+
+        function exportReport(format) {
+            const fromDate = document.getElementById('fromDate').value;
+            const toDate = document.getElementById('toDate').value;
+
+            window.open(`/Dashboard/ExportDashboardData?format=${format}&fromDate=${fromDate}&toDate=${toDate}`, '_blank');
+        }
+    </script>
+}

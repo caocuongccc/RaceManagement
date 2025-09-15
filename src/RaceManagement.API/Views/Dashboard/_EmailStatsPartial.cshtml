@@ -1,0 +1,62 @@
+﻿@model RaceManagement.Shared.DTOs.EmailDashboardStats
+
+<div class="email-stats">
+    <div class="row text-center mb-3">
+        <div class="col-3">
+            <div class="stat-item">
+                <h4 class="text-success mb-0">@Model.TotalEmailsSent</h4>
+                <small class="text-muted">Sent</small>
+            </div>
+        </div>
+        <div class="col-3">
+            <div class="stat-item">
+                <h4 class="text-warning mb-0">@Model.PendingEmails</h4>
+                <small class="text-muted">Pending</small>
+            </div>
+        </div>
+        <div class="col-3">
+            <div class="stat-item">
+                <h4 class="text-danger mb-0">@Model.FailedEmails</h4>
+                <small class="text-muted">Failed</small>
+            </div>
+        </div>
+        <div class="col-3">
+            <div class="stat-item">
+                <h4 class="text-info mb-0">@Model.EmailsSentToday</h4>
+                <small class="text-muted">Today</small>
+            </div>
+        </div>
+    </div>
+
+    <div class="progress mb-3">
+        <div class="progress-bar bg-success"
+             style="width: @Model.SuccessRate%"
+             role="progressbar">
+            @Model.SuccessRate.ToString("F1")% Success Rate
+        </div>
+    </div>
+
+    @if (Model.EmailTypeBreakdown.Any())
+    {
+        <div class="email-breakdown">
+            <h6 class="mb-2">Email Types:</h6>
+            @foreach (var type in Model.EmailTypeBreakdown)
+            {
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                    <small>@type.EmailType</small>
+                    <div>
+                        <span class="badge bg-success me-1">@type.Sent</span>
+                        @if (type.Failed > 0)
+                        {
+                            <span class="badge bg-danger me-1">@type.Failed</span>
+                        }
+                        @if (type.Pending > 0)
+                        {
+                            <span class="badge bg-warning">@type.Pending</span>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>

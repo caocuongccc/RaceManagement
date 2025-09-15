@@ -39,7 +39,16 @@ namespace RaceManagement.Infrastructure.Services
             _logger = logger;
             //_emailJob = emailJob;
         }
+        // Update GenerateQRCodeAsync to use the service
+        //public async Task<byte[]> GenerateQRCodeAsync(string content)
+        //{
+        //    return await _qrCodeService.GenerateQRCodeAsync(content);
+        //}
 
+        //public async Task<byte[]> GeneratePaymentQRCodeAsync(RegistrationDto registration)
+        //{
+        //    return await _qrCodeService.GeneratePaymentQRCodeAsync(registration);
+        //}
         public async Task<EmailResult> SendEmailAsync(EmailRequest request)
         {
             var stopwatch = Stopwatch.StartNew();

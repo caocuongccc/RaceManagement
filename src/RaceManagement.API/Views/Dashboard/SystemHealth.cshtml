@@ -1,0 +1,117 @@
+﻿@* File: Views/Dashboard/SystemHealth.cshtml *@
+@model RaceManagement.API.ViewModels.SystemHealthViewModel
+@{
+    ViewData["Title"] = Model.PageTitle;
+}
+
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <h1>@Model.PageTitle</h1>
+                <button class="btn btn-primary" onclick="runHealthCheck()">
+                    <i class="fas fa-sync me-1"></i>Run Health Check
+                </button>
+            </div>
+            <p class="text-muted">Last checked: @Model.LastCheck.ToString("dd/MM/yyyy HH:mm")</p>
+        </div>
+    </div>
+
+    <!-- Overall Status -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-@Model.OverallStatusColor">
+                <div class="card-body text-center">
+                    <i class="@Model.OverallStatusIcon fa-3x text-@Model.OverallStatusColor mb-3"></i>
+                    <h3 class="text-@Model.OverallStatusColor">System Status: @Model.Health.Status</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Email Queue Health -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between">
+                    <h5>Email Queue Health</h5>
+                    <span class="badge bg-@Model.EmailQueueStatusColor">@Model.Health.EmailQueueHealth.HealthStatus</span>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-md-3">
+                            <h4 class="text-warning">@Model.Health.EmailQueueHealth.PendingCount</h4>
+                            <small>Pending</small>
+                        </div>
+                        <div class="col-md-3">
+                            <h4 class="text-info">@Model.Health.EmailQueueHealth.ProcessingCount</h4>
+                            <small>Processing</small>
+                        </div>
+                        <div class="col-md-3">
+                            <h4 class="text-danger">@Model.Health.EmailQueueHealth.FailedCount</h4>
+                            <small>Failed</small>
+                        </div>
+                        <div class="col-md-3">
+                            <h4 class="text-muted">
+                                @(Model.Health.EmailQueueHealth.OldestPendingAge?.TotalMinutes.ToString("F0") ?? "0") min
+                            </h4>
+                            <small>Oldest Pending</small>
+                        </div>
+                    </div>
+
+                    @if (Model.HasEmailIssues)
+                    {
+                        <div class="alert alert-warning mt-3">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            Email queue requires attention. High number of failed or pending emails detected.
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        async function runHealthCheck() {
+            const button = event.target;
+            const originalHtml = button.innerHTML;
+            button.disabled = true;
+            button.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Running...';
+
+            try {
+                const response = await fetch('/Dashboard/RunHealthCheck', {
+                    method: 'POST'
+                });
+                const result = await response.json();
+
+                if (result.success) {
+                    showToast('Health check completed successfully', 'success');
+                    // Reload page to show updated status
+                    setTimeout(() => location.reload(), 1000);
+                } else {
+                    showToast('Health check failed: ' + result.error, 'error');
+                }
+            } catch (error) {
+                showToast('Error running health check', 'error');
+            } finally {
+                button.disabled = false;
+                button.innerHTML = originalHtml;
+            }
+        }
+
+        function showToast(message, type) {
+            const toastClass = type === 'success' ? 'alert-success' : 'alert-danger';
+            const toast = $(`
+                    <div class="alert ${toastClass} alert-dismissible fade show toast-notification" role="alert">
+                        ${message}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                `);
+
+            $('body').append(toast);
+            setTimeout(() => toast.alert('close'), 3000);
+        }
+    </script>
+}

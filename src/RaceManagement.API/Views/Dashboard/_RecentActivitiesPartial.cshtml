@@ -1,0 +1,34 @@
+﻿@model List<RaceManagement.Shared.DTOs.RecentActivityDto>
+
+<div class="activity-feed">
+    @if (Model.Any())
+    {
+        @foreach (var activity in Model)
+        {
+            <div class="activity-item d-flex align-items-start mb-3">
+                <div class="activity-icon me-3">
+                    <span class="badge rounded-pill bg-@activity.Color">
+                        <i class="fas fa-@activity.Icon"></i>
+                    </span>
+                </div>
+                <div class="flex-grow-1">
+                    <div class="activity-content">
+                        <p class="mb-1">@activity.Description</p>
+                        <small class="text-muted">
+                            <i class="fas fa-clock me-1"></i>
+                            @activity.Timestamp.ToString("HH:mm dd/MM/yyyy")
+                            - by @activity.UserName
+                        </small>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="text-center text-muted py-4">
+            <i class="fas fa-inbox fa-3x mb-3"></i>
+            <p>No recent activities</p>
+        </div>
+    }
+</div>
