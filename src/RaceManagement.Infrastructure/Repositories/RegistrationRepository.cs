@@ -1,13 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using RaceManagement.Core.Entities;
-using RaceManagement.Abstractions.Enums;
+using RaceManagement.Shared.Enums;
 using RaceManagement.Core.Interfaces;
 using RaceManagement.Infrastructure.Data;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace RaceManagement.Infrastructure.Repositories
 {
@@ -15,6 +10,15 @@ namespace RaceManagement.Infrastructure.Repositories
     {
         public RegistrationRepository(RaceManagementDbContext context) : base(context)
         {
+        }
+
+        public async Task<List<Registration>> GetAllWithDetailsAsync()
+        {
+            return await _context.Registrations
+                        .Include(r => r.Distance)
+                        .ThenInclude(d => d.Race)
+                        .Include(r => r.Race)  // Bổ sung
+                        .ToListAsync();
         }
         public async Task<IEnumerable<Registration>> GetPendingPaymentRegistrationsAsync(int raceId)
         {

@@ -3,9 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using RaceManagement.Application.Jobs;
 using RaceManagement.Core.Interfaces;
 using RaceManagement.Shared.DTOs;
-using RaceManagement.Abstractions.Enums;
+using RaceManagement.Shared.Enums;
 using RaceManagement.Core.Entities;
-using RaceManagement.Infrastructure.Repositories;
 
 namespace RaceManagement.API.Controllers
 {

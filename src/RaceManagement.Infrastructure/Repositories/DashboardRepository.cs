@@ -1,15 +1,8 @@
-﻿using Google;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
-using RaceManagement.Abstractions.Enums;
+﻿using Microsoft.EntityFrameworkCore;
+using RaceManagement.Shared.Enums;
 using RaceManagement.Core.Interfaces;
 using RaceManagement.Infrastructure.Data;
 using RaceManagement.Shared.DTOs;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace RaceManagement.Infrastructure.Repositories
 {

@@ -1,4 +1,4 @@
-﻿using RaceManagement.Abstractions.Enums;
+﻿using RaceManagement.Shared.Enums;
 using System.ComponentModel.DataAnnotations;
 
 namespace RaceManagement.Core.Entities

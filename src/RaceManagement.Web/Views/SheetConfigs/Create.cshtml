@@ -1,0 +1,47 @@
+﻿@model RaceManagement.Shared.DTOs.CreateSheetConfigDto
+
+<h2>Thêm SheetConfig</h2>
+
+<form asp-action="Create" method="post">
+    <div class="form-group">
+        <label asp-for="Name"></label>
+        <input asp-for="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="SpreadsheetId"></label>
+        <input asp-for="SpreadsheetId" class="form-control" />
+        <span asp-validation-for="SpreadsheetId" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="SheetName"></label>
+        <input asp-for="SheetName" class="form-control" />
+        <span asp-validation-for="SheetName" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Description"></label>
+        <input asp-for="Description" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <label>Credential</label>
+        <select asp-for="CredentialId" class="form-control" asp-items="ViewBag.Credentials"></select>
+        <span asp-validation-for="CredentialId" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="HeaderRowIndex"></label>
+        <input asp-for="HeaderRowIndex" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <label asp-for="DataStartRowIndex"></label>
+        <input asp-for="DataStartRowIndex" class="form-control" />
+    </div>
+
+    <button type="submit" class="btn btn-success mt-2">Lưu</button>
+    <a asp-action="Index" class="btn btn-secondary mt-2">Quay lại</a>
+</form>

@@ -1,12 +1,5 @@
-﻿using Google.Apis.Auth.OAuth2;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using RaceManagement.Core.Entities;
-using RaceManagement.Abstractions.Enums;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using GoogleCredential = RaceManagement.Core.Entities.GoogleCredential;
 
 namespace RaceManagement.Infrastructure.Data
@@ -41,12 +34,12 @@ namespace RaceManagement.Infrastructure.Data
                 entity.Property(e => e.PaymentSheetId).HasMaxLength(255);
                 entity.Property(e => e.GoogleCredentialPath).HasMaxLength(500);  // NEW
                 entity.Property(e => e.Status).HasConversion<string>();
+                entity.Property(e => e.HasShirtSale).HasDefaultValue(false);
                 // Add relationship to GoogleSheetConfig
                 entity.HasOne(e => e.SheetConfig)
                     .WithMany(e => e.Races)
                     .HasForeignKey(e => e.SheetConfigId)
                     .OnDelete(DeleteBehavior.SetNull); // Set null when config deleted
-
                             entity.HasIndex(e => e.SheetConfigId);
                             entity.HasIndex(e => e.SheetId).IsUnique();
                         });

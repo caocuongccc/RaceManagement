@@ -1,0 +1,36 @@
+﻿@model List<RaceManagement.Shared.DTOs.RaceDto>
+
+<h2>Danh sách Giải chạy</h2>
+<p><a class="btn btn-primary" asp-action="Create">+ Tạo giải mới</a></p>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Tên</th>
+            <th>Ngày</th>
+            <th>Email</th>
+            <th>Sheet</th>
+            <th>Trạng thái</th>
+            <th>Ngày tạo</th>
+            <th>Số lượng VDV</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var r in Model)
+        {
+            <tr>
+                <td>@r.Name</td>
+                <td>@r.RaceDate.ToString("dd/MM/yyyy")</td>
+                <td>@r.Email</td>
+                <td>@r.SheetSource</td>
+                <td>@r.Status</td>
+                <td>@r.CreatedAt.ToString("dd/MM/yyyy")</td>
+                <td>
+                    <a asp-controller="Registrations" asp-action="Index" asp-route-raceId="@r.Id" class="btn btn-sm btn-info">Xem VĐV</a>
+                </td>
+                <a asp-action="Export" asp-route-raceId="@r.Id" class="btn btn-success">Export CSV</a>
+
+            </tr>
+        }
+    </tbody>
+</table>

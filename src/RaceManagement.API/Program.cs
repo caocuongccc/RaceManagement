@@ -1,4 +1,4 @@
-//using Microsoft.EntityFrameworkCore;
+﻿//using Microsoft.EntityFrameworkCore;
 //using RaceManagement.Infrastructure.Data;
 //using RaceManagement.Core.Interfaces;
 //using RaceManagement.Infrastructure.Repositories;
@@ -233,7 +233,9 @@ app.MapControllerRoute(
 app.MapControllers();
 
 // Hangfire
-app.UseHangfireDashboard("/hangfire");
+//app.UseHangfireDashboard("/hangfire");
+app.UseHangfireDashboard();   // hiển thị dashboard tại /hangfire
+app.UseHangfireServer();      // bật worker để xử lý job
 
 // Recurring Jobs
 RecurringJob.AddOrUpdate<IEmailJob>("process-pending-emails",
@@ -242,5 +244,9 @@ RecurringJob.AddOrUpdate<IEmailJob>("process-scheduled-emails",
     x => x.ProcessScheduledEmailsAsync(), Cron.Minutely);
 RecurringJob.AddOrUpdate<IEmailJob>("retry-failed-emails",
     x => x.RetryFailedEmailsAsync(), Cron.Hourly);
+//RecurringJob.AddOrUpdate<PaymentSyncService>(
+//    "sync-payments",
+//    s => s.SyncPaymentsAsync(raceId: 1),   // có thể loop tất cả races active
+//    Cron.Minutely);                        // ví dụ chạy mỗi phút
 
 app.Run();

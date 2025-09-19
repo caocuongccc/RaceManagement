@@ -1,0 +1,74 @@
+﻿@model RaceManagement.Shared.DTOs.CreateRaceDto
+
+<h2>Tạo Giải chạy</h2>
+
+<form asp-action="Create" method="post">
+    <div class="form-group">
+        <label asp-for="Name"></label>
+        <input asp-for="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="RaceDate"></label>
+        <input asp-for="RaceDate" type="date" class="form-control" />
+        <span asp-validation-for="RaceDate" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Email"></label>
+        <input asp-for="Email" class="form-control" />
+        <span asp-validation-for="Email" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="EmailPassword"></label>
+        <input asp-for="EmailPassword" type="password" class="form-control" />
+        <span asp-validation-for="EmailPassword" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label>Sheet Config</label>
+        <select asp-for="SheetConfigId" class="form-control" asp-items="ViewBag.SheetConfigs"></select>
+        <span asp-validation-for="SheetConfigId" class="text-danger"></span>
+    </div>
+
+    <h4>Cự ly</h4>
+    <div id="distances">
+        @for (int i = 0; i < Model.Distances.Count; i++)
+        {
+            <div class="border p-2 mb-2">
+                <label>Khoảng cách</label>
+                <input asp-for="Distances[@i].Distance" class="form-control" />
+                <label>Giá</label>
+                <input asp-for="Distances[@i].Price" class="form-control" />
+                <label>Bib Prefix</label>
+                <input asp-for="Distances[@i].BibPrefix" class="form-control" />
+                <label>Số lượng tối đa</label>
+                <input asp-for="Distances[@i].MaxParticipants" class="form-control" />
+            </div>
+        }
+    </div>
+
+    <h4>Áo</h4>
+    <div id="shirts">
+        @for (int i = 0; i < Model.ShirtTypes.Count; i++)
+        {
+            <div class="border p-2 mb-2">
+                <label>Danh mục</label>
+                <input asp-for="ShirtTypes[@i].ShirtCategory" class="form-control" />
+                <label>Loại áo</label>
+                <input asp-for="ShirtTypes[@i].ShirtType" class="form-control" />
+                <label>Kích cỡ</label>
+                <input asp-for="ShirtTypes[@i].AvailableSizes" class="form-control" />
+                <label>Giá</label>
+                <input asp-for="ShirtTypes[@i].Price" class="form-control" />
+                <label>Kích hoạt</label>
+                <input asp-for="ShirtTypes[@i].IsActive" type="checkbox" />
+            </div>
+        }
+    </div>
+
+    <button type="submit" class="btn btn-success mt-2">Tạo</button>
+    <a asp-action="Index" class="btn btn-secondary mt-2">Quay lại</a>
+</form>

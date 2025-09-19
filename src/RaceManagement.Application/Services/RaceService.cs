@@ -2,14 +2,9 @@
 using Microsoft.Extensions.Logging;
 using RaceManagement.Application.Jobs;
 using RaceManagement.Core.Entities;
-using RaceManagement.Abstractions.Enums;
+using RaceManagement.Shared.Enums;
 using RaceManagement.Core.Interfaces;
 using RaceManagement.Shared.DTOs;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace RaceManagement.Application.Services
 {
@@ -60,7 +55,9 @@ namespace RaceManagement.Application.Services
                     Email = dto.Email,
                     EmailPassword = dto.EmailPassword, // Should encrypt this
                     SheetConfigId = dto.SheetConfigId,  // NEW - use sheet config instead of direct sheet ID
-                    Status = RaceStatus.Active
+                    Status = RaceStatus.Active,
+                    HasShirtSale = dto.HasShirtSale,
+                    GoogleCredentialPath = sheetConfig.GetCredentialPath()
                 };
 
                 // Add distances

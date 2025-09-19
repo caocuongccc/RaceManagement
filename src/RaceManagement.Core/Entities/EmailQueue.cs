@@ -1,5 +1,6 @@
-﻿using RaceManagement.Abstractions.Enums;
+﻿using RaceManagement.Shared.Enums;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace RaceManagement.Core.Entities
 {
@@ -45,8 +46,9 @@ namespace RaceManagement.Core.Entities
         public virtual Registration Registration { get; set; } = null!;
 
         // Helper methods
+        [NotMapped]
         public bool CanRetry => RetryCount < MaxRetries && Status == EmailStatus.Failed;
-
+        [NotMapped]
         public bool IsScheduled => ScheduledAt.HasValue && ScheduledAt > DateTime.Now;
 
         public void IncrementRetry(string errorMessage)

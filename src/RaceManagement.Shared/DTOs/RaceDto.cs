@@ -27,6 +27,8 @@ namespace RaceManagement.Shared.DTOs
         public string Status { get; set; } = string.Empty;
         public DateTime CreatedAt { get; set; }
         public List<RaceDistanceDto> Distances { get; set; } = new();
+        //public bool HasShirtSale { get; set; }
+
         public List<RaceShirtTypeDto> ShirtTypes { get; set; } = new(); // NEW
 
         // Computed properties

@@ -164,8 +164,8 @@ namespace RaceManagement.Infrastructure.Services
                 Distance = GetCellValue(row, 7).Trim(),               // H - Cự ly
                 Gender = NormalizeGender(GetCellValue(row, 8)),       // I - Giới tính
                 ShirtCategory = NormalizeShirtCategory(GetCellValue(row, 11)), // L - Loại áo
-                ShirtSize = NormalizeShirtSize(GetCellValue(row, 12)), // M - Size áo
-                ShirtType = NormalizeShirtType(GetCellValue(row, 13)), // N - Kiểu áo
+                ShirtSize = NormalizeShirtSize(GetCellValue(row, 13)), // M - Size áo
+                ShirtType = NormalizeShirtType(GetCellValue(row, 12)), // N - Kiểu áo
             };
 
             // Parse birth date with advanced logic

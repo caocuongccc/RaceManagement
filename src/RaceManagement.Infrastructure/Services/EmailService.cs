@@ -3,13 +3,12 @@ using MailKit.Net.Smtp;
 using MailKit.Security;
 using MimeKit;
 using RaceManagement.Core.Entities;
-using RaceManagement.Abstractions.Enums;
+using RaceManagement.Shared.Enums;
 using RaceManagement.Core.Interfaces;
 using RaceManagement.Core.Models;
 using RaceManagement.Shared.DTOs;
 using System.Diagnostics;
 using Microsoft.Extensions.Logging;
-using RaceManagement.Infrastructure.Repositories;
 using RaceManagement.Application.Jobs;
 using Hangfire;
 

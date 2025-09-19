@@ -1,13 +1,8 @@
 ﻿using Hangfire;
 using Microsoft.Extensions.Logging;
-using RaceManagement.Abstractions.Enums;
+using RaceManagement.Shared.Enums;
 using RaceManagement.Core.Interfaces;
 using RaceManagement.Shared.DTOs;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace RaceManagement.Application.Jobs
 {

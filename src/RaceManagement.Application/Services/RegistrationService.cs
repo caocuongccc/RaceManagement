@@ -2,14 +2,10 @@
 using Microsoft.Extensions.Logging;
 using RaceManagement.Application.Jobs;
 using RaceManagement.Core.Entities;
-using RaceManagement.Abstractions.Enums;
+using RaceManagement.Shared.Enums;
 using RaceManagement.Core.Interfaces;
 using RaceManagement.Shared.DTOs;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using RaceManagement.Application.Helpers;
 
 namespace RaceManagement.Application.Services
 {
@@ -18,17 +14,48 @@ namespace RaceManagement.Application.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly IGoogleSheetsService _googleSheetsService;
         private readonly ILogger<RegistrationService> _logger;
+        IRegistrationRepository _registrationRepository;
 
         public RegistrationService(
             IUnitOfWork unitOfWork,
             IGoogleSheetsService googleSheetsService,
+            IRegistrationRepository registrationRepository,
             ILogger<RegistrationService> logger)
         {
             _unitOfWork = unitOfWork;
             _googleSheetsService = googleSheetsService;
+            _registrationRepository = registrationRepository;
             _logger = logger;
         }
-
+        public async Task<List<RegistrationDto>> GetAllAsync()
+        {
+            var regs = await _registrationRepository.GetAllWithDetailsAsync();
+            return regs.Select(r => new RegistrationDto
+            {
+                RaceId = r.RaceId,
+                RaceName = r.Race.Name,
+                DistanceId = r.DistanceId,
+                Distance = r.Distance.Distance,   // vì RaceDistance có property Distance
+                Price = r.Distance.Price,
+                FullName = r.FullName,
+                BibName = r.BibName,
+                Email = r.Email,
+                Phone = r.Phone,
+                BirthYear = r.BirthYear,
+                DateOfBirth = r.DateOfBirth,
+                RawBirthInput = r.RawBirthInput,
+                Gender = r.Gender.HasValue ? r.Gender.Value.ToString() : null,
+                ShirtCategory = r.ShirtCategory,
+                ShirtSize = r.ShirtSize,
+                ShirtType = r.ShirtType,
+                EmergencyContact = r.EmergencyContact,
+                RegistrationTime = r.RegistrationTime,
+                PaymentStatus = r.PaymentStatus.ToString(),
+                BibNumber = r.BibNumber,
+                BibSentAt = r.BibSentAt,
+                TransactionReference = r.TransactionReference
+            }).ToList();
+        }
         public async Task<SyncResultDto> SyncRegistrationsFromSheetAsync(int raceId)
         {
             var result = new SyncResultDto { RaceId = raceId };
@@ -70,7 +97,7 @@ namespace RaceManagement.Application.Services
 
                 // Read new registrations from Google Sheet
                 var sheetRegistrations = await _googleSheetsService
-                    .ReadNewRegistrationsAsync(race.SheetId, lastRowIndex);
+                    .ReadNewRegistrationsAsync(race.SheetConfig!.SpreadsheetId, lastRowIndex);
 
                 _logger.LogInformation("Found {Count} new registrations for race {RaceId} from row {LastRow}",
                     sheetRegistrations.Count(), raceId, lastRowIndex + 1);
@@ -113,7 +140,9 @@ namespace RaceManagement.Application.Services
                             Phone = sheetReg.Phone,
                             BirthYear = sheetReg.BirthYear,
                             Gender = ParseGender(sheetReg.Gender),
-                            ShirtSize = sheetReg.ShirtSize,
+                            ShirtCategory = sheetReg.ShirtCategory,  // nhớ map luôn Category
+                            ShirtType = sheetReg.ShirtType,          // nhớ map luôn Type
+                            ShirtSize = sheetReg.ShirtSize,          // và Size
                             EmergencyContact = sheetReg.EmergencyContact,
                             RegistrationTime = sheetReg.Timestamp,
                             SheetRowIndex = sheetReg.RowIndex,
@@ -121,6 +150,16 @@ namespace RaceManagement.Application.Services
                             PaymentStatus = PaymentStatus.Pending
                         };
 
+                        // ✅ Validate shirt info nếu race có bán áo
+                        if (race.HasShirtSale)
+                        {
+                            if (!ShirtValidator.ValidateShirtSelection(registration, race, out var shirtError))
+                            {
+                                _logger.LogWarning("Invalid shirt selection for {Email}: {Error}", registration.Email, shirtError);
+                                result.Errors.Add($"Row {sheetReg.RowIndex}: {shirtError}");
+                                continue; // bỏ qua registration này, không insert DB
+                            }
+                        }
                         await _unitOfWork.Registrations.AddAsync(registration);
                         result.Added++;
 

@@ -1,13 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using RaceManagement.Core.Entities;
-using RaceManagement.Abstractions.Enums;
+using RaceManagement.Shared.Enums;
 using RaceManagement.Core.Interfaces;
 using RaceManagement.Infrastructure.Data;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace RaceManagement.Infrastructure.Repositories
 {
@@ -46,7 +41,7 @@ namespace RaceManagement.Infrastructure.Repositories
         public async Task<IEnumerable<EmailQueue>> GetFailedEmailsForRetryAsync(int batchSize = 10)
         {
             return await _dbSet
-                .Where(e => e.Status == EmailStatus.Failed && e.CanRetry)
+                .Where(e => e.Status == EmailStatus.Failed && e.RetryCount < 3)
                 .Include(e => e.Registration)
                 .OrderBy(e => e.UpdatedAt)
                 .Take(batchSize)

@@ -1,10 +1,5 @@
-﻿using RaceManagement.Abstractions.Enums;
+﻿using RaceManagement.Shared.Enums;
 using RaceManagement.Shared.DTOs;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace RaceManagement.Core.Interfaces
 {

@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="..\build\RaceManagement.Web.props" />
+</Project>

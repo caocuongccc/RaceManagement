@@ -1,13 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using RaceManagement.Core.Entities;
-using RaceManagement.Abstractions.Enums;
+using RaceManagement.Shared.Enums;
 using RaceManagement.Core.Interfaces;
 using RaceManagement.Infrastructure.Data;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace RaceManagement.Infrastructure.Repositories
 {
@@ -31,6 +26,8 @@ namespace RaceManagement.Infrastructure.Repositories
         {
             return await _dbSet
             .Include(r => r.Distances)
+            .Include(r => r.SheetConfig)  // ✅ thêm cái này
+            .ThenInclude(sc => sc.Credential) // ✅ Include luôn Credential
             .Include(r => r.ShirtTypes.Where(st => st.IsActive))  // NEW: Include shirt types
             .FirstOrDefaultAsync(r => r.Id == id);
         }

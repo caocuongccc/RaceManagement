@@ -1,5 +1,5 @@
-﻿using RaceManagement.Abstractions.Enums;
-using EmailPriority = RaceManagement.Abstractions.Enums.EmailPriority;
+﻿using RaceManagement.Shared.Enums;
+using EmailPriority = RaceManagement.Shared.Enums.EmailPriority;
 
 namespace RaceManagement.Shared.DTOs
 {

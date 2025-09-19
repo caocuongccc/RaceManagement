@@ -1,0 +1,43 @@
+﻿@model IEnumerable<RaceManagement.Shared.DTOs.RegistrationDto>
+
+@{
+    ViewData["Title"] = "Danh sách VĐV đăng ký";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Họ tên</th>
+            <th>Bib Name</th>
+            <th>Email</th>
+            <th>Điện thoại</th>
+            <th>Cự ly</th>
+            <th>Phí</th>
+            <th>Áo</th>
+            <th>Thanh toán</th>
+            <th>Bib #</th>
+            <th>Tuổi</th>
+            <th>Ngày đăng ký</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var r in Model)
+        {
+            <tr>
+                <td>@r.FullName</td>
+                <td>@r.BibName</td>
+                <td>@r.Email</td>
+                <td>@r.Phone</td>
+                <td>@r.Distance</td>
+                <td>@r.Price.ToString("N0") VNĐ</td>
+                <td>@r.ShirtFullDescription</td>
+                <td>@(r.IsPaid ? "✅ Paid" : "❌ Unpaid")</td>
+                <td>@r.BibNumber</td>
+                <td>@r.Age</td>
+                <td>@r.RegistrationTime.ToString("dd/MM/yyyy HH:mm")</td>
+            </tr>
+        }
+    </tbody>
+</table>

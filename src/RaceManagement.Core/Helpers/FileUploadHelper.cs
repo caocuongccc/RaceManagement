@@ -1,5 +1,6 @@
 ﻿
 using Microsoft.AspNetCore.Http;
+using RaceManagement.Core.Entities;
 
 namespace RaceManagement.Core.Helpers
 {
@@ -79,4 +80,6 @@ namespace RaceManagement.Core.Helpers
             Errors.Add(error);
         }
     }
+
+    
 }

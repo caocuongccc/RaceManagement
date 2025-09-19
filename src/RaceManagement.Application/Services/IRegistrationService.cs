@@ -12,6 +12,8 @@ namespace RaceManagement.Application.Services
         Task<SyncResultDto> SyncRegistrationsFromSheetAsync(int raceId);
         Task<RegistrationDto?> GetRegistrationAsync(int id);
         Task<IEnumerable<RegistrationDto>> GetRegistrationsByRaceAsync(int raceId);
+        Task<List<RegistrationDto>> GetAllAsync();
+
         Task ProcessPaymentAsync(int registrationId, PaymentNotificationDto notification);
         Task<string> GenerateBibNumberAsync(int registrationId);
         Task<string> GenerateTransactionReference();

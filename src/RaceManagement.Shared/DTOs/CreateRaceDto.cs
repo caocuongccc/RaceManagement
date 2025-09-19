@@ -34,7 +34,7 @@ namespace RaceManagement.Shared.DTOs
     // public string? SheetId { get; set; } // REMOVED
     [MinLength(1, ErrorMessage = "Phải có ít nhất một cự ly")]
     public List<CreateRaceDistanceDto> Distances { get; set; } = new();
-    
+    public bool HasShirtSale { get; set; }
     public List<CreateRaceShirtTypeDto> ShirtTypes { get; set; } = new();
     }
     public class CreateRaceShirtTypeDto                            // NEW

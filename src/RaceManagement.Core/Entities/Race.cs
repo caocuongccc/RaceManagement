@@ -1,5 +1,4 @@
-﻿using RaceManagement.Core.Entities;
-using RaceManagement.Abstractions.Enums;
+﻿using RaceManagement.Shared.Enums;
 
 
 namespace RaceManagement.Core.Entities
@@ -14,7 +13,7 @@ namespace RaceManagement.Core.Entities
         public string? PaymentSheetId { get; set; }
         public string? GoogleCredentialPath { get; set; }             // NEW: Specific credential file
         public RaceStatus Status { get; set; } = RaceStatus.Active;
-
+        public bool HasShirtSale { get; set; } = false;  // NEW - default không bán
         // Navigation properties
         public virtual ICollection<RaceDistance> Distances { get; set; } = new List<RaceDistance>();
         public virtual ICollection<Registration> Registrations { get; set; } = new List<Registration>();

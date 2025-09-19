@@ -1,10 +1,5 @@
-﻿using RaceManagement.Abstractions.Enums;
+﻿using RaceManagement.Shared.Enums;
 using RaceManagement.Core.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace RaceManagement.Core.Interfaces
 {
@@ -23,6 +18,7 @@ namespace RaceManagement.Core.Interfaces
         Task<IEnumerable<Registration>> GetPendingPaymentRegistrationsAsync(int raceId);
         Task<IEnumerable<Registration>> GetPaidRegistrationsAsync(int raceId);
         Task<IEnumerable<Registration>> GetByRaceIdAsync(int raceId);
+        Task<List<Registration>> GetAllWithDetailsAsync();
 
         // Additional helper methods
         Task<Registration?> GetRegistrationByEmailAndRaceAsync(string email, int raceId);

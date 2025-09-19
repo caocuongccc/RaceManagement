@@ -1,4 +1,4 @@
-﻿using RaceManagement.Abstractions.Enums;
+﻿using RaceManagement.Shared.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
