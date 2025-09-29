@@ -35,6 +35,9 @@ namespace RaceManagement.Infrastructure.Data
                 entity.Property(e => e.GoogleCredentialPath).HasMaxLength(500);  // NEW
                 entity.Property(e => e.Status).HasConversion<string>();
                 entity.Property(e => e.HasShirtSale).HasDefaultValue(false);
+                entity.Property(e => e.BankName).HasMaxLength(100);
+                entity.Property(e => e.BankAccountNo).HasMaxLength(50);
+                entity.Property(e => e.BankAccountHolder).HasMaxLength(255);
                 // Add relationship to GoogleSheetConfig
                 entity.HasOne(e => e.SheetConfig)
                     .WithMany(e => e.Races)
@@ -76,12 +79,14 @@ namespace RaceManagement.Infrastructure.Data
                 entity.Property(e => e.BibNumber).HasMaxLength(20);
                 entity.Property(e => e.QRCodePath).HasMaxLength(500);
                 entity.Property(e => e.TransactionReference).IsRequired().HasMaxLength(100);
+                entity.Property(e => e.Fee).HasColumnType("decimal(18,2)").HasDefaultValue(0);
 
                 entity.HasIndex(e => e.TransactionReference).IsUnique();
                 entity.HasIndex(e => e.Email);
                 entity.HasIndex(e => e.PaymentStatus);
                 entity.HasIndex(e => new { e.RaceId, e.Email });
                 entity.HasIndex(e => new { e.RaceId, e.DistanceId });
+                    entity.Property(e => e.Fee).HasColumnType("decimal(18,2)").HasDefaultValue(0);
 
                 entity.HasOne(e => e.Race)
                     .WithMany(e => e.Registrations)

@@ -38,6 +38,10 @@ namespace RaceManagement.Infrastructure.Data
         cd src/RaceManagement.API
         dotnet ef migrations add InitialCreate --project../RaceManagement.Infrastructure --startup-project.
         dotnet ef database update --project../RaceManagement.Infrastructure --startup-project.
+
+        dotnet ef migrations add AddRaceBankInfoAndRegistrationFee
+        dotnet Ef database update
+
         */
 
         /* 

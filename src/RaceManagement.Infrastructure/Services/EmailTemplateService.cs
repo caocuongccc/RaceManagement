@@ -166,7 +166,7 @@ namespace RaceManagement.Infrastructure.Services
 
         private string GenerateRegistrationConfirmationTemplate(RegistrationDto registration)
         {
-            return $"""
+            return $$$"""
         <html>
         <head>
             <meta charset="utf-8">
@@ -189,10 +189,12 @@ namespace RaceManagement.Infrastructure.Services
                     </ul>
                 </div>
                 
-                <div style="background: #fef3c7; padding: 15px; border-radius: 5px; margin: 20px 0;">
+                <div style="background: #fef3c7; padding: 15px; border-radius: 5px; margin: 20px 0; text-align: center;">
                     <h3>Thanh toán:</h3>
-                    <p>Vui lòng chuyển khoản với nội dung: <strong>{registration.TransactionReference}</strong></p>
-                    <p>Sau khi thanh toán, bạn sẽ nhận được email thông báo số BIB.</p>
+                    <p>Vui lòng quét mã QR bên dưới hoặc chuyển khoản với nội dung: 
+                       <strong>{{TransactionReference}}</strong></p>
+                    <p>Số tiền: <strong>{{Price}} VNĐ</strong></p>
+                    <img src="cid:payment-qr" alt="QR Code Thanh toán" style="max-width:200px; margin-top:10px;" />
                 </div>
                 
                 <p>Cảm ơn bạn đã tham gia!</p>

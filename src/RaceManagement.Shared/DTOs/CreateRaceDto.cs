@@ -29,13 +29,16 @@ namespace RaceManagement.Shared.DTOs
     // NEW SYSTEM - Chỉ cần chọn Sheet Config từ dropdown
     [Required(ErrorMessage = "Sheet config là bắt buộc")]
     public int SheetConfigId { get; set; }
-
+    public string? BankName { get; set; }          // Ví dụ: "Vietcombank"
+    public string? BankAccountNo { get; set; }     // Số tài khoản
+    public string? BankAccountHolder { get; set; } // Tên chủ tài khoản
     // Remove legacy SheetId property - không cần nữa
     // public string? SheetId { get; set; } // REMOVED
     [MinLength(1, ErrorMessage = "Phải có ít nhất một cự ly")]
     public List<CreateRaceDistanceDto> Distances { get; set; } = new();
     public bool HasShirtSale { get; set; }
     public List<CreateRaceShirtTypeDto> ShirtTypes { get; set; } = new();
+    
     }
     public class CreateRaceShirtTypeDto                            // NEW
     {

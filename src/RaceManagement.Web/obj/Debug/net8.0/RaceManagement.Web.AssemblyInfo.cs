@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("RaceManagement.Web")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+a6e8c9b9e2adc538949bdb351aa78382f53ac19f")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+9840aa0854c57274e4311a073c42a256ca29c23f")]
 [assembly: System.Reflection.AssemblyProductAttribute("RaceManagement.Web")]
 [assembly: System.Reflection.AssemblyTitleAttribute("RaceManagement.Web")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

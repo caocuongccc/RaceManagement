@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RaceManagement.Infrastructure.Data;
 
@@ -11,9 +12,11 @@ using RaceManagement.Infrastructure.Data;
 namespace RaceManagement.Infrastructure.Migrations
 {
     [DbContext(typeof(RaceManagementDbContext))]
-    partial class RaceManagementDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250919152632_AddRaceBankInfoAndRegistrationFee")]
+    partial class AddRaceBankInfoAndRegistrationFee
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

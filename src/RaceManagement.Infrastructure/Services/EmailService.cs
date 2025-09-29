@@ -11,6 +11,8 @@ using System.Diagnostics;
 using Microsoft.Extensions.Logging;
 using RaceManagement.Application.Jobs;
 using Hangfire;
+using Microsoft.EntityFrameworkCore;
+using RaceManagement.Infrastructure.Data;
 
 namespace RaceManagement.Infrastructure.Services
 {
@@ -20,7 +22,7 @@ namespace RaceManagement.Infrastructure.Services
         private readonly IEmailTemplateService _templateService;
         private readonly IQRCodeService _qrCodeService;
         private readonly EmailConfiguration _emailConfig;
-        //private readonly IEmailJob _emailJob;
+        private readonly RaceManagementDbContext _raceManagementDbContext;
         private readonly ILogger<EmailService> _logger;
 
         public EmailService(
@@ -28,7 +30,8 @@ namespace RaceManagement.Infrastructure.Services
             IEmailTemplateService templateService,
             IQRCodeService qrCodeService,
             IOptions<EmailConfiguration> emailConfig,
-            ILogger<EmailService> logger
+            ILogger<EmailService> logger,
+            RaceManagementDbContext raceManagementDbContext
             )
         {
             _unitOfWork = unitOfWork;
@@ -36,7 +39,7 @@ namespace RaceManagement.Infrastructure.Services
             _qrCodeService = qrCodeService;
             _emailConfig = emailConfig.Value;
             _logger = logger;
-            //_emailJob = emailJob;
+            _raceManagementDbContext = raceManagementDbContext;
         }
         // Update GenerateQRCodeAsync to use the service
         //public async Task<byte[]> GenerateQRCodeAsync(string content)
@@ -172,10 +175,57 @@ namespace RaceManagement.Infrastructure.Services
 
             return result;
         }
+        //public async Task<EmailResult> SendRegistrationConfirmationAsync(int registrationId)
+        //{
+        //    var registration = await _raceManagementDbContext.Registrations
+        //        .Include(r => r.Race)
+        //        .Include(r => r.Distance)
+        //        .FirstOrDefaultAsync(r => r.Id == registrationId);
+
+        //    if (registration == null)
+        //        return new EmailResult { IsSuccess = false, ErrorMessage = "Registration not found" };
+
+        //    // Tạo QR code VietQR với tổng số tiền
+        //    var qrCodeBytes = await _qrCodeService.GeneratePaymentQRCodeAsync(
+        //        registration.TransactionReference,
+        //        registration.TotalAmount,
+        //        registration.Race
+        //    );
+
+        //    // Convert QR code sang Base64 để nhúng vào HTML
+        //    var qrBase64 = $"data:image/png;base64,{Convert.ToBase64String(qrCodeBytes)}";
+
+        //    // Render template (thêm placeholder {{QrCode}} vào template)
+        //    var template = await _templateService.RenderTemplateAsync("registration-confirmation", new
+        //    {
+        //        registration.FullName,
+        //        registration.Race.Name,
+        //        registration.Distance.Distance,
+        //        registration.TransactionReference,
+        //        Price = registration.TotalAmount.ToString("N0"),
+        //        registration.GetShirtFullDescription(),
+        //        QrCode = qrBase64
+        //    });
+
+        //    var emailRequest = new EmailRequest
+        //    {
+        //        To = registration.Email,
+        //        Subject = $"Xác nhận đăng ký {registration.Race.Name}",
+        //        HtmlBody = template
+        //    };
+
+        //    return await _emailSender.SendEmailAsync(emailRequest);
+        //}
+
 
         public async Task<EmailResult> SendRegistrationConfirmationAsync(int registrationId)
         {
-            var registration = await _unitOfWork.Registrations.GetByIdWithIncludesAsync(registrationId);
+            //var registration = await _unitOfWork.Registrations.GetByIdWithIncludesAsync(registrationId);            //var registration = await _unitOfWork.Registrations.GetByIdWithIncludesAsync(registrationId);
+            var registration = await _raceManagementDbContext.Registrations
+                .Include(r => r.Race)
+                .Include(r => r.Distance)
+                //.Include(r => r.Race.ShirtTypes)
+                .FirstOrDefaultAsync(r => r.Id == registrationId);
             if (registration == null)
             {
                 return new EmailResult
@@ -194,8 +244,8 @@ namespace RaceManagement.Infrastructure.Services
             // Generate payment QR code
             var qrCodeBytes = await _qrCodeService.GeneratePaymentQRCodeAsync(
                 registration.TransactionReference,
-                registration.Distance.Price,
-                $"{registration.Race.Name} - {registration.Distance.Distance}"
+                registration.TotalAmount,
+                registration.Race
             );
 
             var emailRequest = new EmailRequest

@@ -14,10 +14,14 @@ namespace RaceManagement.Core.Entities
         public string? GoogleCredentialPath { get; set; }             // NEW: Specific credential file
         public RaceStatus Status { get; set; } = RaceStatus.Active;
         public bool HasShirtSale { get; set; } = false;  // NEW - default không bán
+        public string? BankName { get; set; }          // Ví dụ: "Vietcombank"
+        public string? BankAccountNo { get; set; }     // Số tài khoản
+        public string? BankAccountHolder { get; set; } // Tên chủ tài khoản
         // Navigation properties
         public virtual ICollection<RaceDistance> Distances { get; set; } = new List<RaceDistance>();
         public virtual ICollection<Registration> Registrations { get; set; } = new List<Registration>();
         public virtual ICollection<RaceShirtType> ShirtTypes { get; set; } = new List<RaceShirtType>(); // NEW
+        
 
         // Helper methods
         public bool IsActive => Status == RaceStatus.Active;

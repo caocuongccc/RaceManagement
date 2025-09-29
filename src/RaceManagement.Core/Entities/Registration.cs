@@ -1,4 +1,5 @@
 ﻿using RaceManagement.Shared.Enums;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace RaceManagement.Core.Entities
 {
@@ -31,6 +32,7 @@ namespace RaceManagement.Core.Entities
         public string? QRCodePath { get; set; }
         public int? SheetRowIndex { get; set; }
         public string TransactionReference { get; set; } = string.Empty;
+        public decimal Fee { get; set; }   // Distance.Price + Shirt.Price (nếu có)
 
         // Navigation properties
         public virtual Race Race { get; set; } = null!;
@@ -39,6 +41,31 @@ namespace RaceManagement.Core.Entities
         public virtual ICollection<EmailLog> EmailLogs { get; set; } = new List<EmailLog>();
 
         // Helper methods
+
+        [NotMapped]
+        public decimal TotalAmount
+        {
+            get
+            {
+                decimal? total = Distance?.Price ?? 0;
+
+                if (Race?.HasShirtSale == true && !string.IsNullOrEmpty(ShirtSize))
+                {
+                    // Tìm đúng loại áo mà VĐV chọn
+                    var shirt = Race.ShirtTypes
+                        .FirstOrDefault(st =>
+                            st.IsActive &&
+                            st.ShirtCategory.Equals(ShirtCategory, StringComparison.OrdinalIgnoreCase) &&
+                            st.ShirtType.Equals(ShirtType, StringComparison.OrdinalIgnoreCase));
+
+                    if (shirt != null)
+                        total += shirt.Price;
+                }
+
+                return (decimal)total;
+            }
+        }
+
         public int CalculateAge(DateTime? referenceDate = null)
         {
             if (!DateOfBirth.HasValue) return 0;

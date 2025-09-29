@@ -57,7 +57,10 @@ namespace RaceManagement.Application.Services
                     SheetConfigId = dto.SheetConfigId,  // NEW - use sheet config instead of direct sheet ID
                     Status = RaceStatus.Active,
                     HasShirtSale = dto.HasShirtSale,
-                    GoogleCredentialPath = sheetConfig.GetCredentialPath()
+                    GoogleCredentialPath = sheetConfig.GetCredentialPath(),
+                    BankName = dto.BankName,
+                    BankAccountNo = dto.BankAccountNo,
+                    BankAccountHolder = dto.BankAccountHolder
                 };
 
                 // Add distances
@@ -90,6 +93,25 @@ namespace RaceManagement.Application.Services
 
                 _logger.LogInformation("Created race {RaceId}: {RaceName} with sheet config {SheetConfigId}",
                     race.Id, race.Name, race.SheetConfigId);
+
+                // 1. Clone sheet gốc để tạo Payment Tracking Sheet
+                var paymentSheetId = await _googleSheetsService.CreatePaymentTrackingSheetAsync(
+                    sheetConfig.SpreadsheetId,
+                    race.Name,
+                    sheetConfig.GetCredentialPath()
+                );
+                race.PaymentSheetId = paymentSheetId;
+
+                // 2. Lưu lại thay đổi
+                await _unitOfWork.SaveChangesAsync();
+
+                // 3. Bật auto sync registrations từ sheet
+                // Đặt recurring job với Hangfire (ví dụ 30 giây/lần)
+                RecurringJob.AddOrUpdate<IRegistrationService>(
+                    $"sync-registrations-race-{race.Id}",
+                    x => x.SyncRegistrationsFromSheetAsync(race.Id),
+                    Cron.MinuteInterval(1)  // mỗi 1 phút, bạn có thể chỉnh 30s
+                );
 
                 return MapToDto(race);
             }

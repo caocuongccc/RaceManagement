@@ -1,4 +1,5 @@
-﻿using RaceManagement.Shared.DTOs;
+﻿using RaceManagement.Core.Entities;
+using RaceManagement.Shared.DTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,10 +12,12 @@ namespace RaceManagement.Core.Interfaces
     {
         Task<byte[]> GenerateQRCodeAsync(string content, int size = 200);
         Task<byte[]> GeneratePaymentQRCodeAsync(string transactionReference, decimal amount, string bankInfo);
+        Task<byte[]> GeneratePaymentQRCodeAsync(string transactionReference, decimal amount, Race race);
         Task<string> GeneratePaymentStringAsync(string transactionReference, decimal amount, string bankInfo);
         Task<byte[]> GenerateBibQRCodeAsync(string bibNumber, string raceName);
         Task<byte[]> GenerateQRCodeWithLogoAsync(string content, byte[]? logoBytes = null);
         Task<byte[]> GeneratePaymentQRCodeAsync(RegistrationDto registration);
+        //Task<byte[]> GenerateVietQRAsync(VietQRPayload payload);
 
     }
 }

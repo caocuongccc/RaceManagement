@@ -14,18 +14,21 @@ namespace RaceManagement.Application.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly IGoogleSheetsService _googleSheetsService;
         private readonly ILogger<RegistrationService> _logger;
+        private readonly IQRCodeService _qRCodeService;
         IRegistrationRepository _registrationRepository;
 
         public RegistrationService(
             IUnitOfWork unitOfWork,
             IGoogleSheetsService googleSheetsService,
             IRegistrationRepository registrationRepository,
-            ILogger<RegistrationService> logger)
+            ILogger<RegistrationService> logger,
+            IQRCodeService qRCodeService)
         {
             _unitOfWork = unitOfWork;
             _googleSheetsService = googleSheetsService;
             _registrationRepository = registrationRepository;
             _logger = logger;
+            _qRCodeService = qRCodeService; 
         }
         public async Task<List<RegistrationDto>> GetAllAsync()
         {
@@ -59,6 +62,7 @@ namespace RaceManagement.Application.Services
         public async Task<SyncResultDto> SyncRegistrationsFromSheetAsync(int raceId)
         {
             var result = new SyncResultDto { RaceId = raceId };
+            var newRegistrations = new List<Registration>();
 
             try
             {
@@ -147,7 +151,15 @@ namespace RaceManagement.Application.Services
                             RegistrationTime = sheetReg.Timestamp,
                             SheetRowIndex = sheetReg.RowIndex,
                             TransactionReference = await GenerateTransactionReference(),
-                            PaymentStatus = PaymentStatus.Pending
+                            PaymentStatus = PaymentStatus.Pending,
+                           
+                            Fee = distance.Price +
+                                  (race.HasShirtSale
+                                      ? race.ShirtTypes
+                                            .FirstOrDefault(st => st.ShirtType == sheetReg.ShirtType
+                                                                && st.ShirtCategory == sheetReg.ShirtCategory)?
+                                            .Price ?? 0
+                                      : 0)
                         };
 
                         // ✅ Validate shirt info nếu race có bán áo
@@ -161,10 +173,8 @@ namespace RaceManagement.Application.Services
                             }
                         }
                         await _unitOfWork.Registrations.AddAsync(registration);
+                        newRegistrations.Add(registration);
                         result.Added++;
-
-                        // AUTO-QUEUE REGISTRATION CONFIRMATION EMAIL
-                        BackgroundJob.Enqueue<IEmailJob>(x => x.SendRegistrationConfirmationEmailAsync(registration.Id));
 
                         _logger.LogInformation("Added registration for {Email}, reference: {Reference}",
                             registration.Email, registration.TransactionReference);
@@ -175,7 +185,18 @@ namespace RaceManagement.Application.Services
                         result.Errors.Add($"Row {sheetReg.RowIndex}: {ex.Message}");
                     }
                 }
-                
+                if (newRegistrations.Any())
+                {
+                    await _unitOfWork.SaveChangesAsync();
+
+                    // enqueue sau khi đã có Id
+                    foreach (var reg in newRegistrations)
+                    {
+                        BackgroundJob.Enqueue<IEmailJob>(
+                            x => x.SendRegistrationConfirmationEmailAsync(reg.Id)
+                        );
+                    }
+                }
                 // Update sheet config last sync row if using new system
                 if (race.HasSheetConfig && result.Added > 0)
                 {
